@@ -1,0 +1,14 @@
+version: '3'
+
+volumes:
+  jupyter_data: {}
+
+services:
+  jupyter:
+    build:
+      context: .
+      dockerfile: ./compose/jupyter/Dockerfile
+    ports:
+      - "8888:8888"
+    volumes:
+      - jupyter_data:/home/jovyan/
