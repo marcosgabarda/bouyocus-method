@@ -1,0 +1,43 @@
+version: '3'
+
+volumes:
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
+  production_media: {}
+  production_static: {}
+
+services:
+  jupyter:
+    build:
+      context: .
+      dockerfile: ./compose/jupyter/Dockerfile
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./compose/nginx/Dockerfile
+    depends_on:
+      - jupyter
+    networks:
+      traefik:
+        aliases:
+          - jupyter_nginx
+      default:
+        aliases:
+          - nginx
+    ports:
+      - "80"
+    labels:
+      - traefik.enable=true
+      - traefik.backend=jupyter_nginx
+      - traefik.frontend.rule=Host:yatla.mgabarda.com
+      - traefik.docker.network=traefik
+      - traefik.port=80
+      - traefik.protocol=http
+    volumes:
+      - production_media:/data/media
+      - production_static:/data/static
+
+networks:
+  traefik:
+    external: true
